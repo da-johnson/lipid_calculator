@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Lipid Stock Solution Calculator</title>
+<script>
+function calculateVolume() {
+    // Collect inputs from the user
+    var stockConcentration = parseFloat(document.getElementById('stockConcentration').value);
+    var molecularWeight = parseFloat(document.getElementById('molecularWeight').value);
+    var desiredConcentration = parseFloat(document.getElementById('desiredConcentration').value);
+    var finalVolume = parseFloat(document.getElementById('finalVolume').value);
+    var concentrationType = document.getElementById('concentrationType').value;
+
+    // Calculate the volume of stock solution needed
+    var volumeStock;
+    if (concentrationType === 'mM') {
+        // Convert mM to mg/mL using the molecular weight
+        var desiredConcentrationMgMl = (desiredConcentration * molecularWeight) / 1000;
+        volumeStock = (desiredConcentrationMgMl * finalVolume) / stockConcentration;
+    } else {
+        // Direct calculation for mg/mL
+        volumeStock = (desiredConcentration * finalVolume) / stockConcentration;
+    }
+
+    // Convert mL to µL for the result
+    var volumeStockMicroliters = volumeStock * 1000;
+
+    // Display the result
+    document.getElementById('result').innerHTML = `Volume of stock solution to add: ${volumeStockMicroliters.toFixed(2)} µL`;
+}
+</script>
+</head>
+<body>
+<h2>Lipid Stock Solution Calculator</h2>
+<div>
+    <label for="stockConcentration">Stock Concentration (mg/mL):</label>
+    <input type="number" id="stockConcentration" required>
+</div>
+<div>
+    <label for="molecularWeight">Molecular Weight (g/mol):</label>
+    <input type="number" id="molecularWeight" required>
+</div>
+<div>
+    <label for="desiredConcentration">Desired Concentration:</label>
+    <input type="number" id="desiredConcentration" required>
+</div>
+<div>
+    <label for="finalVolume">Final Volume (mL):</label>
+    <input type="number" id="finalVolume" required>
+</div>
+<div>
+    <label for="concentrationType">Concentration Type:</label>
+    <select id="concentrationType">
+        <option value="mg/mL">mg/mL</option>
+        <option value="mM">mM</option>
+    </select>
+</div>
+<button onclick="calculateVolume()">Calculate Volume</button>
+<div id="result"></div>
+</body>
+</html>
