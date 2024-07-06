@@ -3,60 +3,174 @@
 <head>
 <meta charset="UTF-8">
 <title>Lipid Stock Solution Calculator</title>
-<script>
-function calculateVolume() {
-    // Collect inputs from the user
-    var stockConcentration = parseFloat(document.getElementById('stockConcentration').value);
-    var molecularWeight = parseFloat(document.getElementById('molecularWeight').value);
-    var desiredConcentration = parseFloat(document.getElementById('desiredConcentration').value);
-    var finalVolume = parseFloat(document.getElementById('finalVolume').value);
-    var concentrationType = document.getElementById('concentrationType').value;
-
-    // Calculate the volume of stock solution needed
-    var volumeStock;
-    if (concentrationType === 'mM') {
-        // Convert mM to mg/mL using the molecular weight
-        var desiredConcentrationMgMl = (desiredConcentration * molecularWeight) / 1000;
-        volumeStock = (desiredConcentrationMgMl * finalVolume) / stockConcentration;
-    } else {
-        // Direct calculation for mg/mL
-        volumeStock = (desiredConcentration * finalVolume) / stockConcentration;
+<style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
     }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+    }
+    th {
+      background-color: #f2f2f2;
+      text-align: left;
+    }
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+</style>
+<script>
+function generateLipidInputs() {
+    var numberOfLipids = parseInt(document.getElementById('numberOfLipids').value);
+    var lipidInputsContainer = document.getElementById('lipidInputsContainer');
+    lipidInputsContainer.innerHTML = '';
 
-    // Convert mL to µL for the result
-    var volumeStockMicroliters = volumeStock * 1000;
+    for (var i = 1; i <= numberOfLipids; i++) {
+        var lipidInputs = `
+            <h3>Lipid ${i}</h3>
+            <div>
+                <label for="name${i}">Lipid Name:</label>
+                <input type="text" id="name${i}" required>
+            </div>
+            <div>
+                <label for="stockConcentration${i}">Stock Concentration (mg/mL):</label>
+                <input type="number" id="stockConcentration${i}" required>
+            </div>
+            <div>
+                <label for="molecularWeight${i}">Molecular Weight (g/mol):</label>
+                <input type="number" id="molecularWeight${i}" required>
+            </div>
+            <div>
+                <label for="desiredConcentration${i}">Desired Concentration:</label>
+                <input type="number" id="desiredConcentration${i}" required>
+            </div>
+            <div>
+                <label for="concentrationType${i}">Concentration Type:</label>
+                <select id="concentrationType${i}">
+                    <option value="mg/mL">mg/mL</option>
+                    <option value="mM">mM</option>
+                </select>
+            </div>
+        `;
+        lipidInputsContainer.innerHTML += lipidInputs;
+    }
+}
 
-    // Display the result
-    document.getElementById('result').innerHTML = `Volume of stock solution to add: ${volumeStockMicroliters.toFixed(2)} µL`;
+function calculateVolume() {
+    var numberOfLipids = parseInt(document.getElementById('numberOfLipids').value);
+    var finalVolume = parseFloat(document.getElementById('finalvolume').value);
+    var resultContainer = document.getElementById('result');
+    resultContainer.innerHTML = '';
+
+    for (var i = 1; i <= numberOfLipids; i++) {
+        var name = document.getElementById(`name${i}`).value;
+        var stockConcentration = parseFloat(document.getElementById(`stockConcentration${i}`).value);
+        var molecularWeight = parseFloat(document.getElementById(`molecularWeight${i}`).value);
+        var desiredConcentration = parseFloat(document.getElementById(`desiredConcentration${i}`).value);
+        var concentrationType = document.getElementById(`concentrationType${i}`).value;
+
+        // Calculate the volume of stock solution needed
+        var volumeStock;
+        if (concentrationType === 'mM') {
+            // Convert mM to mg/mL using the molecular weight
+            var desiredConcentrationMgMl = (desiredConcentration * molecularWeight) / 1000;
+            volumeStock = (desiredConcentrationMgMl * finalVolume) / stockConcentration * 1000;
+        } else {
+            // Direct calculation for mg/mL
+            volumeStock = (desiredConcentration * finalVolume) / stockConcentration * 1000;
+        }
+
+        // Display the result for each lipid
+        resultContainer.innerHTML += `<p>${name}: Volume of stock solution to add: ${volumeStock.toFixed(2)} µL</p>`;
+    }
 }
 </script>
 </head>
 <body>
 <h2>Lipid Stock Solution Calculator</h2>
 <div>
-    <label for="stockConcentration">Stock Concentration (mg/mL):</label>
-    <input type="number" id="stockConcentration" required>
-</div>
-<div>
-    <label for="molecularWeight">Molecular Weight (g/mol):</label>
-    <input type="number" id="molecularWeight" required>
-</div>
-<div>
-    <label for="desiredConcentration">Desired Concentration:</label>
-    <input type="number" id="desiredConcentration" required>
-</div>
-<div>
-    <label for="finalVolume">Final Volume (mL):</label>
-    <input type="number" id="finalVolume" required>
-</div>
-<div>
-    <label for="concentrationType">Concentration Type:</label>
-    <select id="concentrationType">
-        <option value="mg/mL">mg/mL</option>
-        <option value="mM">mM</option>
+    <label for="numberOfLipids">Number of Lipids:</label>
+    <select id="numberOfLipids" onchange="generateLipidInputs()">
+        <option value="0">0</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
     </select>
+</div>
+<div>
+    <label for="finalvolume">Final Volume (mL):</label>
+    <input type="number" id="finalvolume" required>
+</div>
+<div id="lipidInputsContainer">
+    <!-- Lipid input fields will be dynamically generated here -->
 </div>
 <button onclick="calculateVolume()">Calculate Volume</button>
 <div id="result"></div>
+<table>
+    <tr>
+      <th>Lipid Name</th>
+      <th>Stock Concentration</th>
+      <th>FW</th>
+    </tr>
+    <tr>
+      <td><a href="https://avantilipids.com/product/840051">Egg PC</a></td>
+      <td>25 mg/mL</td>
+      <td>770.123</td>
+    </tr>
+    <tr>
+      <td><a href="https://avantilipids.com/product/100500">E. coli extract Total</a></td>
+      <td>25 mg/mL</td>
+      <td>Not listed</td>
+    </tr>
+    <tr>
+      <td><a href="https://avantilipids.com/product/880132">DPPG (PEG2000) Biotin</a></td>
+      <td>5 mg/mL</td>
+      <td>3016.21</td>
+    </tr>
+    <tr>
+      <td><a href="https://avantilipids.com/product/840475">18:1 (Δ9-Cis) PG</a></td>
+      <td>10 mg/mL</td>
+      <td>773.999</td>
+    </tr>
+    <tr>
+      <td><a href="https://avantilipids.com/product/850457">16:0-18:1 PC</a></td>
+      <td>2 x 100 mg/4 mL</td>
+      <td>760.076</td>
+    </tr>
+    <tr>
+      <td><a href="https://avantilipids.com/product/850375">18:1 (Δ9-Cis) PC (DOPC)</a></td>
+      <td>25 mg/mL</td>
+      <td>786.113</td>
+    </tr>
+    <tr>
+      <td><a href="https://avantilipids.com/product/880220">PEG2000 PE</a></td>
+      <td>1 x 25 mg</td>
+      <td>744.034</td>
+    </tr>
+    <tr>
+      <td><a href="https://avantilipids.com/product/840054">Soy PC</a></td>
+      <td>2 x 100 mg</td>
+      <td>775.037</td>
+    </tr>
+    <tr>
+      <td><a href="https://avantilipids.com/product/700000">Cholesterol (ovine)</a></td>
+      <td>1 x 5 gram</td>
+      <td>386.654</td>
+    </tr>
+    <tr>
+      <td><a href="https://avantilipids.com/product/710335">18:1 Cardiolipin</a></td>
+      <td>5 mg/mL</td>
+      <td>1501.059</td>
+    </tr>
+    <tr>
+      <td><a href="https://avantilipids.com/product/810335">18:1 Cy5 PE</a></td>
+      <td>1 mg/mL</td>
+      <td>1262.17</td>
+    </tr>
+  </table>
+
 </body>
 </html>
